@@ -1,12 +1,16 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
-
+import { Button } from './ui/button';
 import Pro from '@/assets/pro.jpg';
+import { MainContext } from './context/useMainContext';
+
 export default function Header() {
   const [user, setUser] = useState([]);
   const [name, setName] = useState('');
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+  const { showMessage, setShowMessage } = useContext(MainContext);
 
   const fetchUserDetails = () => {
     axios
@@ -25,6 +29,11 @@ export default function Header() {
       });
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('motor_socmed');
+    window.location.href = '/login';
+  };
+
   useEffect(() => {
     fetchUserDetails();
   }, []);
@@ -39,12 +48,15 @@ export default function Header() {
       </div>
 
       <div className="relative">
-        <img
-          onClick={() => setShowProfileMenu(!showProfileMenu)}
-          className="rounded-full w-[3rem] h-[3rem] object-cover cursor-pointer"
-          src={Pro}
-          alt=""
-        />
+        <div className="flex gap-5 items-center">
+          <Button onClick={() => setShowMessage(!showMessage)}>Message</Button>
+          <img
+            onClick={() => setShowProfileMenu(!showProfileMenu)}
+            className="rounded-full w-[3rem] h-[3rem] object-cover cursor-pointer"
+            src={Pro}
+            alt=""
+          />
+        </div>
 
         {showProfileMenu && (
           <div className="absolute border-2 w-[10rem] right-[5rem] flex flex-col justify-center items-center bg-white rounded-md p-2">
@@ -55,6 +67,10 @@ export default function Header() {
             <Link to="/profile">
               <p>Profile</p>
             </Link>
+
+            <p className="cursor-pointer" onClick={handleLogout}>
+              Logout
+            </p>
           </div>
         )}
       </div>

@@ -30,6 +30,9 @@ function App() {
   const [posts, setPosts] = useState<PostsType[]>([]);
   const [comment, setComment] = useState('');
   const [showComments, setShowComments] = useState(false);
+  const [postIndex, setPostIndex] = useState(0);
+
+  const user_id = localStorage.getItem('motor_socmed') as string;
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsChecked(event.target.checked);
@@ -82,6 +85,28 @@ function App() {
   useEffect(() => {
     fetchAllPosts();
   }, []);
+
+  const handleDeletePost = (post_id: string) => {
+    axios
+      .delete(`${import.meta.env.VITE_MOTOR_MARKETPLACE}/post.php`, {
+        data: {
+          post_id,
+        },
+      })
+      .then((res) => {
+        if (res.data.status === 'success') {
+          window.location.reload();
+        }
+
+        console.log(res.data);
+      });
+  };
+
+  const handleShowComments = (index: number) => {
+    setShowComments(!showComments);
+    console.log(index);
+    setPostIndex(index);
+  };
 
   return (
     <div className="flex justify-center flex-col items-center relative">
@@ -182,10 +207,16 @@ function App() {
                       key={index}
                       className="flex border-2 p-2 flex-col w-full mb-[5rem] text-start"
                     >
-                      <div className="self-end gap-2 flex my-2">
-                        <Button>Update</Button>
-                        <Button>Delete</Button>
-                      </div>
+                      {parseInt(user_id) === parseInt(post.user_id) && (
+                        <div className="self-end gap-2 flex my-2">
+                          <Button>Update</Button>
+                          <Button
+                            onClick={() => handleDeletePost(post.post_id)}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      )}
 
                       <img
                         src={post!.post_image}
@@ -199,14 +230,22 @@ function App() {
                         </div>
 
                         {post.post_isForSale === 'True' && (
-                          <div className="p-4 flex gap-4">
+                          <div className="p-4 flex gap-4 w-[100%]">
                             <div>
                               <p>{post.post_location}</p>
                               <p>{post.post_price}</p>
                             </div>
 
                             <div>
-                              <Button>Send Message</Button>
+                              <Button
+                                disabled={
+                                  parseInt(user_id) === parseInt(post.user_id)
+                                    ? true
+                                    : false
+                                }
+                              >
+                                Send Message
+                              </Button>
                             </div>
                           </div>
                         )}
@@ -214,19 +253,19 @@ function App() {
 
                       <div className="flex gap-2 my-2">
                         <Button>1 Like</Button>
-                        <Button onClick={() => setShowComments(!showComments)}>
+                        <Button onClick={() => handleShowComments(index)}>
                           {showComments ? 'Hide Comments' : 'Show Comments'}
                         </Button>
                       </div>
+
+                      {showComments && postIndex === index && (
+                        <div>
+                          <h1>COMMENTS DIRIA</h1>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
-
-              {showComments && (
-                <div>
-                  <h1>COMMENTS DIRIA</h1>
-                </div>
-              )}
             </div>
           </div>
         </div>
