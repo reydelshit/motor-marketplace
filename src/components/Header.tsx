@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from './ui/button';
-import Pro from '@/assets/pro.jpg';
+import Default from '@/assets/default.png';
 import { MainContext } from './context/useMainContext';
 
 export default function Header() {
@@ -53,7 +53,7 @@ export default function Header() {
           <img
             onClick={() => setShowProfileMenu(!showProfileMenu)}
             className="rounded-full w-[3rem] h-[3rem] object-cover cursor-pointer"
-            src={Pro}
+            src={Default}
             alt=""
           />
         </div>
