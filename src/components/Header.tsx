@@ -49,7 +49,7 @@ export default function Header() {
       <div className="p-2">
         <h1 className="text-2xl font-bold">Hello, {name}</h1>
         <p className="text-sm">
-          Welcome to Motor Connections where you can flex you motorcylce
+          Welcome to Motor Connections where you can flex your motorcylce
         </p>
       </div>
 

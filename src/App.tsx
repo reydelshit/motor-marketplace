@@ -391,7 +391,7 @@ function App() {
                 <div className="flex gap-4">
                   <img
                     className="w-[8rem] h-[8rem] object-cover rounded-full"
-                    src={Default}
+                    src={image.length > 0 ? image : Default}
                     alt="profile"
                   />
 
