@@ -10,6 +10,13 @@ import Header from './Header';
 import { Label } from '@radix-ui/react-label';
 import { MainContext } from './context/useMainContext';
 import Sidebar from './Sidebar';
+import { IoIosArrowUp } from 'react-icons/io';
+import { IoIosArrowDown } from 'react-icons/io';
+import { TbBallpen } from 'react-icons/tb';
+import { RiDeleteBin5Line } from 'react-icons/ri';
+import { LuMessagesSquare } from 'react-icons/lu';
+import { CiLocationOn } from 'react-icons/ci';
+import { IoPricetagOutline } from 'react-icons/io5';
 
 type PostsType = {
   post_id: string;
@@ -310,7 +317,7 @@ function YourPosts() {
           setShowMotorInput={setShowMotorInput}
         />
         {showMotorInput && (
-          <div className="fixed bg-white w-full z-90 h-full border-2 flex justify-center bg-opacity-75">
+          <div className="fixed bg-white w-full z-90 h-full border-2 flex justify-center bg-opacity-90">
             <div className="flex flex-col items-center justify-center gap-2 my-[2rem] w-[45rem] border-2 min-h-[30rem] h-fit mt-[15rem] bg-white p-4 rounded-md">
               <form onSubmit={handlePost}>
                 <div className="flex gap-4">
@@ -388,7 +395,7 @@ function YourPosts() {
         )}
 
         {showUpdateForm && (
-          <div className="fixed bg-white w-full z-90 h-full border-2 flex justify-center bg-opacity-75">
+          <div className="fixed bg-white w-full z-90 h-full border-2 flex justify-center bg-opacity-90">
             <div className="flex flex-col items-center justify-center gap-2 my-[2rem] w-[45rem] border-2 min-h-[30rem] h-fit mt-[15rem] bg-white p-4 rounded-md">
               <form onSubmit={handleUpdate}>
                 <div className="flex gap-4">
@@ -486,11 +493,13 @@ function YourPosts() {
                               handleShowUpdate(parseInt(post.post_id))
                             }
                           >
+                            <TbBallpen className="w-[1.5rem] h-[1.5rem]" />
                             Update
                           </Button>
                           <Button
                             onClick={() => handleDeletePost(post.post_id)}
                           >
+                            <RiDeleteBin5Line className="w-[1.5rem] h-[1.5rem]" />
                             Delete
                           </Button>
                         </div>
@@ -509,11 +518,97 @@ function YourPosts() {
                             {post.post_context}
                           </p>
                         </div>
+                      </div>
+
+                      <div className="flex justify-between">
+                        <div className="flex gap-2 my-2 items-center">
+                          <div className="flex flex-col gap-3 w-[5rem]">
+                            <h1 className="font-bold text-center border-b-4 border-blue-500 text-2xl rounded-sm">
+                              {postLike.filter(
+                                (like) =>
+                                  like.type.includes('upvote') &&
+                                  parseInt(like.post_id) ===
+                                    parseInt(post.post_id),
+                              ).length -
+                                postLike.filter(
+                                  (like) =>
+                                    like.type.includes('downvote') &&
+                                    parseInt(like.post_id) ===
+                                      parseInt(post.post_id),
+                                ).length}
+                            </h1>
+                            <div className="flex flex-col justify-center items-center">
+                              <IoIosArrowUp
+                                onClick={() =>
+                                  handleUpvote(
+                                    parseInt(post.post_id),
+                                    parseInt(post.user_id),
+                                  )
+                                }
+                                className="w-[2rem] h-[2rem] cursor-pointer"
+                              />
+                              <p className="text-blue-500 font-bold">
+                                {
+                                  postLike.filter(
+                                    (like) =>
+                                      like.type.includes('upvote') &&
+                                      parseInt(like.post_id) ===
+                                        parseInt(post.post_id),
+                                  ).length
+                                }
+                              </p>
+                            </div>
+                            <div className="flex flex-col justify-center items-center">
+                              <IoIosArrowDown
+                                onClick={() =>
+                                  handleDownVote(
+                                    parseInt(post.post_id),
+                                    parseInt(post.user_id),
+                                  )
+                                }
+                                className="w-[2rem] h-[2rem] cursor-pointer"
+                              />
+
+                              <p className="text-blue-500 font-bold">
+                                {
+                                  postLike.filter(
+                                    (like) =>
+                                      like.type.includes('downvote') &&
+                                      parseInt(like.post_id) ===
+                                        parseInt(post.post_id),
+                                  ).length
+                                }
+                              </p>
+                            </div>
+                          </div>
+
+                          <Button
+                            onClick={() =>
+                              handleShowComments(index, parseInt(post.post_id))
+                            }
+                          >
+                            {showComments
+                              ? 'Hide Comments'
+                              : `${
+                                  comments.filter(
+                                    (comment) =>
+                                      parseInt(comment.post_id) ===
+                                      parseInt(post.post_id),
+                                  ).length
+                                } Comments`}
+                          </Button>
+                        </div>
 
                         {post.post_isForSale === 'True' && (
-                          <div className="p-4 flex gap-4 w-[10rem] flex-col">
-                            <div className="break-words w-full flex flex-col">
-                              <p>{post.post_location}</p>
+                          <div className="p-4 flex gap-4 w-[50%] flex-col justify-end items-end">
+                            <div className="flex flex-row w-full justify-end">
+                              <CiLocationOn className="w-[1.5rem] h-[1.5rem] mr-2" />{' '}
+                              <p className="break-words w-[60%]">
+                                {post.post_location}
+                              </p>
+                            </div>
+                            <div className="flex flex-row">
+                              <IoPricetagOutline className="w-[1.5rem] h-[1.5rem] mr-2" />{' '}
                               <p className="font-bold">{post.post_price}</p>
                             </div>
 
@@ -533,82 +628,12 @@ function YourPosts() {
                                 //     : false
                                 // }
                               >
+                                <LuMessagesSquare className="w-[1.5rem] h-[1.5rem] mr-2" />{' '}
                                 Send Message
                               </Button>
                             </div>
                           </div>
                         )}
-                      </div>
-
-                      <div className="flex gap-2 my-2 items-center">
-                        <div className="flex flex-col gap-3">
-                          <h1 className="font-bold text-center">
-                            {postLike.filter(
-                              (like) =>
-                                like.type.includes('upvote') &&
-                                parseInt(like.post_id) ===
-                                  parseInt(post.post_id),
-                            ).length -
-                              postLike.filter(
-                                (like) =>
-                                  like.type.includes('downvote') &&
-                                  parseInt(like.post_id) ===
-                                    parseInt(post.post_id),
-                              ).length}
-                          </h1>
-                          <Button
-                            onClick={() =>
-                              handleUpvote(
-                                parseInt(post.post_id),
-                                parseInt(post.user_id),
-                              )
-                            }
-                          >
-                            {
-                              postLike.filter(
-                                (like) =>
-                                  like.type.includes('upvote') &&
-                                  parseInt(like.post_id) ===
-                                    parseInt(post.post_id),
-                              ).length
-                            }{' '}
-                            Upvote
-                          </Button>
-                          <Button
-                            onClick={() =>
-                              handleDownVote(
-                                parseInt(post.post_id),
-                                parseInt(post.user_id),
-                              )
-                            }
-                          >
-                            {
-                              postLike.filter(
-                                (like) =>
-                                  like.type.includes('downvote') &&
-                                  parseInt(like.post_id) ===
-                                    parseInt(post.post_id),
-                              ).length
-                            }{' '}
-                            Downvote
-                          </Button>
-                        </div>
-
-                        <Button
-                          onClick={() =>
-                            handleShowComments(index, parseInt(post.post_id))
-                          }
-                        >
-                          {showComments
-                            ? 'Hide Comments'
-                            : `${
-                                comments.filter(
-                                  (comment) =>
-                                    parseInt(comment.post_id) ===
-                                    parseInt(post.post_id),
-                                ).length
-                              } Comments`}
-                        </Button>
                       </div>
 
                       {showComments && postIndex === index && (

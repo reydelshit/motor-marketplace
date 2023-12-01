@@ -1,10 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from './ui/button';
+
 import Default from '../assets/default.png';
 import axios from 'axios';
 import { useState } from 'react';
 import { useEffect } from 'react';
+import { MdEditNote } from 'react-icons/md';
+import { FaHome } from 'react-icons/fa';
+import { MdOutlineNoteAlt } from 'react-icons/md';
+import { CiLogout } from 'react-icons/ci';
 export default function Sidebar({
   setShowMotorInput,
   showMotorInput,
@@ -61,29 +65,40 @@ export default function Sidebar({
             alt=""
           />
           <div>
-            <h1 className="font-bold text-2xl">{user.name}</h1>
+            <h1 className="font-bold text-2xl cursor-pointer hover:text-blue-500 ">
+              {user.name}
+            </h1>
             <p>{user.email}</p>
           </div>
         </div>
         <Link to={`/`}>
-          <Button className="w-full mb-2">Home</Button>
+          <h1 className="w-full mb-2 cursor-pointer hover:text-blue-500 font-bold flex py-3">
+            <FaHome className="w-[1.5rem] h-[1.5rem] mr-2" /> Home
+          </h1>
         </Link>
-        <Button
-          className="w-full"
+        <h1
+          className="w-full cursor-pointer hover:text-blue-500 font-bold flex py-3"
           onClick={() => setShowMotorInput(!showMotorInput)}
         >
+          <MdEditNote className="w-[1.5rem] h-[1.5rem] mr-2" />{' '}
           {showMotorInput ? 'Close' : 'Post Now'}
-        </Button>
+        </h1>
 
         <Link to={`/post/${user_id}`}>
-          <Button className="w-full mt-2">Your Posts</Button>
+          <h1 className="w-full mt-2 cursor-pointer hover:text-blue-500 font-bold flex py-5">
+            <MdOutlineNoteAlt className="w-[1.5rem] h-[1.5rem] mr-2" /> Your
+            Posts
+          </h1>
         </Link>
       </div>
 
       <div className="w-full block">
-        <Button onClick={handleLogout} className="w-full">
-          Logout
-        </Button>
+        <h1
+          onClick={handleLogout}
+          className="w-full cursor-pointer hover:text-blue-500 font-bold flex py-5d"
+        >
+          <CiLogout className="w-[1.5rem] h-[1.5rem] mr-2" /> Logout
+        </h1>
       </div>
     </div>
   );

@@ -6,7 +6,8 @@ import Default from '@/assets/default.png';
 import { MainContext } from './context/useMainContext';
 import Message from './Message';
 import Notification from './Notification';
-
+import { LuMessagesSquare } from 'react-icons/lu';
+import { IoIosNotificationsOutline } from 'react-icons/io';
 export default function Header() {
   const [user, setUser] = useState([]);
   const [name, setName] = useState('');
@@ -62,10 +63,11 @@ export default function Header() {
           <Button
             onClick={() => setShowNotificationHeader(!showNotificationHeader)}
           >
+            <IoIosNotificationsOutline className="w-[1.5rem] h-[1.5rem] mr-2" />
             Notification
           </Button>
           <Button onClick={() => setShowMessageHeader(!showMessageHeader)}>
-            Message
+            <LuMessagesSquare className="w-[1.5rem] h-[1.5rem] mr-2" /> Message
           </Button>
           <img
             onClick={() => setShowProfileMenu(!showProfileMenu)}
@@ -76,7 +78,7 @@ export default function Header() {
         </div>
 
         {showProfileMenu && (
-          <div className="absolute border-2 w-[10rem] left-0 flex flex-col justify-center items-center bg-white rounded-md p-2">
+          <div className="absolute border-2 w-[10rem] left-[10rem] flex flex-col justify-center items-center bg-white rounded-md p-2">
             <Link to="/profile">
               <p>Profile</p>
             </Link>

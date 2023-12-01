@@ -93,7 +93,7 @@ export default function SendMessage() {
                   className={`border-2 p-2 mt-[1rem] rounded-sm  ${
                     parseInt(res.receiver_id) === userId
                       ? 'bg-gray-200'
-                      : 'bg-black !text-white'
+                      : 'bg-blue-600 !text-white'
                   } text-start`}
                 >
                   <p>{res.message_context}</p>
