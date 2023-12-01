@@ -1,15 +1,15 @@
-import { Button } from './components/ui/button';
+import { Button } from './ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import Default from '@/assets/default.png';
-import { Input } from './components/ui/input';
+import { Input } from './ui/input';
 import { useContext, useState } from 'react';
 import axios from 'axios';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import Header from './components/Header';
+import Header from './Header';
 import { Label } from '@radix-ui/react-label';
-import { MainContext } from './components/context/useMainContext';
-import Sidebar from './components/Sidebar';
+import { MainContext } from './context/useMainContext';
+import Sidebar from './Sidebar';
 
 type PostsType = {
   post_id: string;
@@ -42,7 +42,7 @@ type LikeType = {
   post_id: string;
   type: string;
 };
-function App() {
+function YourPosts() {
   const [showMotorInput, setShowMotorInput] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [post_context, setPost_context] = useState('');
@@ -104,7 +104,11 @@ function App() {
 
   const fetchAllPosts = () => {
     axios
-      .get(`${import.meta.env.VITE_MOTOR_MARKETPLACE}/post.php`)
+      .get(`${import.meta.env.VITE_MOTOR_MARKETPLACE}/post.php`, {
+        params: {
+          user_id: localStorage.getItem('motor_socmed'),
+        },
+      })
       .then((res) => {
         console.log(res.data);
 
@@ -300,11 +304,11 @@ function App() {
     <div className="flex justify-center flex-col items-center relative">
       <div className=" bg-slate-50 w-full">
         <Header />
+
         <Sidebar
           showMotorInput={showMotorInput}
           setShowMotorInput={setShowMotorInput}
         />
-
         {showMotorInput && (
           <div className="fixed bg-white w-full z-90 h-full border-2 flex justify-center bg-opacity-75">
             <div className="flex flex-col items-center justify-center gap-2 my-[2rem] w-[45rem] border-2 min-h-[30rem] h-fit mt-[15rem] bg-white p-4 rounded-md">
@@ -462,9 +466,12 @@ function App() {
           </div>
         )}
 
-        <div className="my-[2rem] flex justify-center flex-col items-center text-center mt-[10rem]">
+        <div className="my-[2rem] flex justify-center flex-col items-center mt-[10rem]">
           <div className="w-[60%] flex flex-col justify-center items-centerflex items-center">
-            <div className=" w-[80%]">
+            <div className="w-[80%]">
+              <div className="w-full text-start my-[2rem]">
+                <h1 className="font-bold text-4xl text-start">YOUR POSTS</h1>
+              </div>
               {posts &&
                 posts.map((post, index) => {
                   return (
@@ -683,4 +690,4 @@ function App() {
   );
 }
 
-export default App;
+export default YourPosts;

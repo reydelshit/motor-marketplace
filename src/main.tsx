@@ -6,6 +6,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Login from './components/Login.tsx';
 import Register from './components/Register.tsx';
 import Profile from './components/Profile.tsx';
+import YourPosts from './components/YourPosts.tsx';
 
 const router = createBrowserRouter([
   {
@@ -15,6 +16,11 @@ const router = createBrowserRouter([
       {
         path: '/profile',
         element: <Profile />,
+      },
+
+      {
+        path: '/post/:id',
+        element: <YourPosts />,
       },
     ],
   },

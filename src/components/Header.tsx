@@ -46,8 +46,12 @@ export default function Header() {
 
   return (
     <div className="fixed top-0 flex justify-between items-center h-[7rem] bg-white w-full p-4 border-b-2">
-      <div className="p-2">
-        <h1 className="text-2xl font-bold">Hello, {name}</h1>
+      <div className="p-2 ">
+        <Link to="/">
+          {' '}
+          <h1 className="text-2xl font-bold cursor-pointer">Hello, {name}</h1>
+        </Link>
+
         <p className="text-sm">
           Welcome to Motor Connections where you can flex your motorcylce
         </p>

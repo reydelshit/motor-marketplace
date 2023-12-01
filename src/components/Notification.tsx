@@ -1,6 +1,7 @@
 import axios from 'axios';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 type Notification = {
   notifcation_id: number;
@@ -50,7 +51,10 @@ export default function Notification() {
                 className="border-2 p-2 mt-[1rem] rounded-sm bg-gray-100"
                 key={index}
               >
-                <p className="cursor-pointer">{noti.notification_message}</p>
+                <Link to={`/post/${userId}`}>
+                  <p className="cursor-pointer">{noti.notification_message}</p>{' '}
+                </Link>
+
                 <p> {moment(noti.created_at).format('LLL')}</p>
               </div>
             );
