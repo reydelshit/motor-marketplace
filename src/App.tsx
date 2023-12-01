@@ -2,12 +2,13 @@ import { Button } from './components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import Default from '@/assets/default.png';
 import { Input } from './components/ui/input';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import axios from 'axios';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Header from './components/Header';
 import { Label } from '@radix-ui/react-label';
+import { MainContext } from './components/context/useMainContext';
 
 type PostsType = {
   post_id: string;
@@ -28,6 +29,17 @@ type CommentsType = {
   post_id: string;
   comment_content: string;
   created_at: string;
+
+  name: string;
+  profile_picture: string;
+  email: string;
+};
+
+type LikeType = {
+  like_id: string;
+  user_id: string;
+  post_id: string;
+  type: string;
 };
 function App() {
   const [showMotorInput, setShowMotorInput] = useState(false);
@@ -46,10 +58,47 @@ function App() {
   const user_id = localStorage.getItem('motor_socmed') as string;
 
   const [showUpdateForm, setShowUpdateForm] = useState(false);
-  const [postID, setPostID] = useState('');
+  const [postID, setPostID] = useState(0);
+  const [image, setImage] = useState('' as string);
+  const [user, setUser] = useState({
+    address: '',
+    birthday: '',
+    email: '',
+    gender: '',
+    name: '',
+    password: '',
+    profile_picture: '',
+    user_id: '',
+  });
+  const [postLike, setPostLike] = useState<LikeType[]>([]);
+
+  const {
+    showMessage,
+    setShowMessage,
+    recepientIDNumber,
+    setRecepientIDNumber,
+  } = useContext(MainContext);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsChecked(event.target.checked);
+  };
+
+  const fetchUserDetails = () => {
+    axios
+      .get(`${import.meta.env.VITE_MOTOR_MARKETPLACE}/user.php`, {
+        params: {
+          user_id: localStorage.getItem('motor_socmed'),
+        },
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          console.log('success');
+
+          setImage(res.data[0].profile_picture);
+          setUser(res.data[0]);
+          console.log(res.data);
+        }
+      });
   };
 
   const fetchAllPosts = () => {
@@ -86,7 +135,7 @@ function App() {
     axios
       .get(`${import.meta.env.VITE_MOTOR_MARKETPLACE}/comment.php`)
       .then((res) => {
-        console.log(res.data);
+        console.log(res.data, 'comments');
         setComments(res.data);
       });
   };
@@ -106,8 +155,10 @@ function App() {
   };
 
   useEffect(() => {
+    fetchUserDetails();
     fetchAllPosts();
     fetchALlComments();
+    fetchUpvoteAndDownvote();
   }, []);
 
   const handleDeletePost = (post_id: string) => {
@@ -124,13 +175,14 @@ function App() {
       });
   };
 
-  const handleShowComments = (index: number) => {
+  const handleShowComments = (index: number, post_id: number) => {
     setShowComments(!showComments);
     console.log(index);
     setPostIndex(index);
+    setPostID(post_id);
   };
 
-  const handleShowUpdate = (post_id: string) => {
+  const handleShowUpdate = (post_id: number) => {
     setShowUpdateForm(!showUpdateForm);
     setPostID(post_id);
 
@@ -170,15 +222,63 @@ function App() {
       });
   };
 
-  const handleComment = (post_id: number) => {
+  const handleComment = (post_id: number, post_user_id: number) => {
     axios
       .post(`${import.meta.env.VITE_MOTOR_MARKETPLACE}/comment.php`, {
         user_id: localStorage.getItem('motor_socmed'),
         post_id: post_id,
         comment_content: comment,
+        user_name: user.name,
+        post_user_id,
       })
       .then((res) => {
         console.log(res.data);
+        fetchALlComments();
+      });
+  };
+
+  const handleShowMessage = (id: number) => {
+    setShowMessage(!showMessage);
+    setRecepientIDNumber(id);
+    // console.log(showMessage);
+    console.log(id, 'id');
+  };
+
+  const fetchUpvoteAndDownvote = () => {
+    axios
+      .get(`${import.meta.env.VITE_MOTOR_MARKETPLACE}/like.php`)
+      .then((res) => {
+        console.log(res.data, 'upvote and downvote');
+        setPostLike(res.data);
+      });
+  };
+  const handleUpvote = (post_id: number, post_user_id: number) => {
+    axios
+      .post(`${import.meta.env.VITE_MOTOR_MARKETPLACE}/like.php`, {
+        user_id: localStorage.getItem('motor_socmed'),
+        post_id: post_id,
+        type: 'upvote',
+        post_user_id,
+        user_name: user.name,
+      })
+      .then((res) => {
+        console.log(res.data);
+        fetchUpvoteAndDownvote();
+      });
+  };
+
+  const handleDownVote = (post_id: number, post_user_id: number) => {
+    axios
+      .post(`${import.meta.env.VITE_MOTOR_MARKETPLACE}/like.php`, {
+        user_id: localStorage.getItem('motor_socmed'),
+        post_id: post_id,
+        type: 'downvote',
+        post_user_id,
+        user_name: user.name,
+      })
+      .then((res) => {
+        console.log(res.data);
+        fetchUpvoteAndDownvote();
       });
   };
 
@@ -200,7 +300,7 @@ function App() {
                 <div className="flex gap-4">
                   <img
                     className="w-[8rem] h-[8rem] object-cover rounded-full"
-                    src={Default}
+                    src={image.length > 0 ? image : Default}
                     alt="profile"
                   />
 
@@ -363,7 +463,9 @@ function App() {
                       {parseInt(user_id) === parseInt(post.user_id) && (
                         <div className="self-end gap-2 flex my-2">
                           <Button
-                            onClick={() => handleShowUpdate(post.post_id)}
+                            onClick={() =>
+                              handleShowUpdate(parseInt(post.post_id))
+                            }
                           >
                             Update
                           </Button>
@@ -398,8 +500,11 @@ function App() {
 
                             <div>
                               <Button
+                                onClick={() =>
+                                  handleShowMessage(parseInt(post.user_id))
+                                }
                                 className="z-[-100]"
-                                hidden={
+                                disabled={
                                   parseInt(user_id) === parseInt(post.user_id)
                                     ? true
                                     : false
@@ -412,10 +517,74 @@ function App() {
                         )}
                       </div>
 
-                      <div className="flex gap-2 my-2">
-                        <Button>1 Like</Button>
-                        <Button onClick={() => handleShowComments(index)}>
-                          {showComments ? 'Hide Comments' : ` Show Comments`}
+                      <div className="flex gap-2 my-2 items-center">
+                        <div className="flex flex-col gap-3">
+                          <h1 className="font-bold text-center">
+                            {postLike.filter(
+                              (like) =>
+                                like.type.includes('upvote') &&
+                                parseInt(like.post_id) ===
+                                  parseInt(post.post_id),
+                            ).length -
+                              postLike.filter(
+                                (like) =>
+                                  like.type.includes('downvote') &&
+                                  parseInt(like.post_id) ===
+                                    parseInt(post.post_id),
+                              ).length}
+                          </h1>
+                          <Button
+                            onClick={() =>
+                              handleUpvote(
+                                parseInt(post.post_id),
+                                parseInt(post.user_id),
+                              )
+                            }
+                          >
+                            {
+                              postLike.filter(
+                                (like) =>
+                                  like.type.includes('upvote') &&
+                                  parseInt(like.post_id) ===
+                                    parseInt(post.post_id),
+                              ).length
+                            }{' '}
+                            Upvote
+                          </Button>
+                          <Button
+                            onClick={() =>
+                              handleDownVote(
+                                parseInt(post.post_id),
+                                parseInt(post.user_id),
+                              )
+                            }
+                          >
+                            {
+                              postLike.filter(
+                                (like) =>
+                                  like.type.includes('downvote') &&
+                                  parseInt(like.post_id) ===
+                                    parseInt(post.post_id),
+                              ).length
+                            }{' '}
+                            Downvote
+                          </Button>
+                        </div>
+
+                        <Button
+                          onClick={() =>
+                            handleShowComments(index, parseInt(post.post_id))
+                          }
+                        >
+                          {showComments
+                            ? 'Hide Comments'
+                            : `${
+                                comments.filter(
+                                  (comment) =>
+                                    parseInt(comment.post_id) ===
+                                    parseInt(post.post_id),
+                                ).length
+                              } Show Comments`}
                         </Button>
                       </div>
 
@@ -423,23 +592,37 @@ function App() {
                         <div>
                           <div className="p-4">
                             {comments &&
-                              comments.map((comment, index) => {
-                                return (
-                                  <div
-                                    key={index}
-                                    className="flex gap-2 text-2xl"
-                                  >
-                                    <Link to={`/profile/${comment.user_id}`}>
-                                      <img
-                                        src={Default}
-                                        alt="profile"
-                                        className="w-[2rem] h-[2rem] rounded-full"
-                                      />
-                                    </Link>
-                                    <p>{comment.comment_content}</p>
-                                  </div>
-                                );
-                              })}
+                              comments
+                                .filter(
+                                  (comment) =>
+                                    parseInt(comment.post_id) === postID,
+                                )
+                                .map((comment, index) => {
+                                  return (
+                                    <div
+                                      key={index}
+                                      className="flex gap-2 text-2xl w-full p-2 rounded-md"
+                                    >
+                                      <Link to={`/profile/${comment.user_id}`}>
+                                        <img
+                                          src={
+                                            comment.profile_picture.length > 0
+                                              ? comment.profile_picture
+                                              : Default
+                                          }
+                                          alt="profile"
+                                          className="w-[2rem] h-[2rem] rounded-full object-cover"
+                                        />
+                                      </Link>
+                                      <div className="flex gap-2 text-sm items-center">
+                                        <h1 className="font-bold">
+                                          {comment.name}
+                                        </h1>
+                                        <p>{comment.comment_content}</p>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
                           </div>
 
                           <div className="flex flex-col">
@@ -449,7 +632,10 @@ function App() {
                             />
                             <Button
                               onClick={() =>
-                                handleComment(parseInt(post.post_id))
+                                handleComment(
+                                  parseInt(post.post_id),
+                                  parseInt(post.user_id),
+                                )
                               }
                               disabled={comment.length === 0 ? true : false}
                               className="my-2 self-end"

@@ -4,13 +4,16 @@ import { Link } from 'react-router-dom';
 import { Button } from './ui/button';
 import Default from '@/assets/default.png';
 import { MainContext } from './context/useMainContext';
+import Message from './Message';
 
 export default function Header() {
   const [user, setUser] = useState([]);
   const [name, setName] = useState('');
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [image, setImage] = useState('');
 
-  const { showMessage, setShowMessage } = useContext(MainContext);
+  // const { showMessage, setShowMessage } = useContext(MainContext);
+  const [showMessageHeader, setShowMessageHeader] = useState(false);
 
   const fetchUserDetails = () => {
     axios
@@ -24,6 +27,7 @@ export default function Header() {
           console.log('success');
           setUser(res.data[0]);
           setName(res.data[0].name);
+          setImage(res.data[0].profile_picture);
           console.log(res.data);
         }
       });
@@ -49,21 +53,19 @@ export default function Header() {
 
       <div className="relative">
         <div className="flex gap-5 items-center">
-          <Button onClick={() => setShowMessage(!showMessage)}>Message</Button>
+          <Button onClick={() => setShowMessageHeader(!showMessageHeader)}>
+            Message
+          </Button>
           <img
             onClick={() => setShowProfileMenu(!showProfileMenu)}
-            className="rounded-full w-[3rem] h-[3rem] object-cover cursor-pointer"
-            src={Default}
+            className="rounded-full w-[4rem] h-[4rem] object-cover cursor-pointer"
+            src={image.length > 0 ? image : Default}
             alt=""
           />
         </div>
 
         {showProfileMenu && (
-          <div className="absolute border-2 w-[10rem] right-[5rem] flex flex-col justify-center items-center bg-white rounded-md p-2">
-            <Link to="/profile">
-              <p>Profile</p>
-            </Link>
-
+          <div className="absolute border-2 w-[10rem] left-0 flex flex-col justify-center items-center bg-white rounded-md p-2">
             <Link to="/profile">
               <p>Profile</p>
             </Link>
@@ -74,6 +76,12 @@ export default function Header() {
           </div>
         )}
       </div>
+
+      {showMessageHeader && (
+        <div className="absolute mt-[2rem] w-[30rem] border-2 right-20 top-24 rounded-lg overflow-hidden">
+          <Message />
+        </div>
+      )}
     </div>
   );
 }

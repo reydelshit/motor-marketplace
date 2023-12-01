@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { useContext, useEffect, useState } from 'react';
 import { MainContext } from './context/useMainContext';
-
+import Default from '@/assets/default.png';
+import moment from 'moment';
 type MessageType = {
   created_at: string;
   message_context: string;
@@ -13,10 +14,31 @@ type MessageType = {
 
 export default function Message() {
   const [message, setMessage] = useState<MessageType[]>([]);
-  const userId = Number(localStorage.getItem('ordering-token'));
+  const userId = Number(localStorage.getItem('motor_socmed'));
 
   const { setRecepientIDNumber, showMessage, setShowMessage } =
     useContext(MainContext);
+
+  const getRecepientMessage = async () => {
+    axios
+      .get(`${import.meta.env.VITE_MOTOR_MARKETPLACE}/message.php`, {
+        params: { sender_id: userId },
+      })
+      .then((res) => {
+        console.log(res.data, 'message');
+        // setRecepientMessage(res.data);
+
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          setMessage(res.data);
+        } else {
+          setMessage([]);
+        }
+      });
+  };
+
+  useEffect(() => {
+    getRecepientMessage();
+  }, []);
 
   const handleShowMessage = (id: number) => {
     setShowMessage(!showMessage);
@@ -26,8 +48,8 @@ export default function Message() {
   };
 
   return (
-    <div className="flex flex-col justify-between relative">
-      <div className="h-[20rem] block overflow-x-auto bg-white">
+    <div className="flex flex-col justify-between">
+      <div className="h-[20rem] block overflow-x-auto bg-white p-4">
         <h1>You have {message.length} message/s</h1>
 
         {message.length > 0 ? (
@@ -40,7 +62,11 @@ export default function Message() {
                 <div className="flex items-center gap-4">
                   <img
                     className="w-[5rem] h-[5rem] rounded-full object-cover"
-                    src={mes.profile_picture}
+                    src={
+                      mes.profile_picture.length > 0
+                        ? mes.profile_picture
+                        : Default
+                    }
                   />
                   <div className="flex flex-col w-full">
                     <span className="flex justify-between w-full">
@@ -51,8 +77,7 @@ export default function Message() {
                         {mes.sender_username}
                       </h1>
                       <p className="text-xs">
-                        {/* {moment(mes.created_at).format('LLL')} */}
-                        date date
+                        {moment(mes.created_at).format('LLL')}
                       </p>
                     </span>
 
@@ -63,7 +88,7 @@ export default function Message() {
             );
           })
         ) : (
-          <p>No notifications</p>
+          <p>No messages</p>
         )}
       </div>
     </div>
