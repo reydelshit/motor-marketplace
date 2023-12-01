@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import Default from '@/assets/default.png';
 import { MainContext } from './context/useMainContext';
 import Message from './Message';
+import Notification from './Notification';
 
 export default function Header() {
   const [user, setUser] = useState([]);
@@ -14,6 +15,7 @@ export default function Header() {
 
   // const { showMessage, setShowMessage } = useContext(MainContext);
   const [showMessageHeader, setShowMessageHeader] = useState(false);
+  const [showNotificationHeader, setShowNotificationHeader] = useState(false);
 
   const fetchUserDetails = () => {
     axios
@@ -53,6 +55,11 @@ export default function Header() {
 
       <div className="relative">
         <div className="flex gap-5 items-center">
+          <Button
+            onClick={() => setShowNotificationHeader(!showNotificationHeader)}
+          >
+            Notification
+          </Button>
           <Button onClick={() => setShowMessageHeader(!showMessageHeader)}>
             Message
           </Button>
@@ -80,6 +87,12 @@ export default function Header() {
       {showMessageHeader && (
         <div className="absolute mt-[2rem] w-[30rem] border-2 right-20 top-24 rounded-lg overflow-hidden">
           <Message />
+        </div>
+      )}
+
+      {showNotificationHeader && (
+        <div className="absolute mt-[2rem] w-[30rem] border-2 right-20 top-24 rounded-lg overflow-hidden">
+          <Notification />
         </div>
       )}
     </div>

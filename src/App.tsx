@@ -282,6 +282,19 @@ function App() {
       });
   };
 
+  const handleDeleteComment = (comment_id: string) => {
+    axios
+      .delete(`${import.meta.env.VITE_MOTOR_MARKETPLACE}/comment.php`, {
+        data: {
+          comment_id,
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+        fetchALlComments();
+      });
+  };
+
   return (
     <div className="flex justify-center flex-col items-center relative">
       <div className=" bg-slate-50 w-full">
@@ -480,7 +493,7 @@ function App() {
                       <img
                         src={post!.post_image}
                         alt="no image available"
-                        className="w-full h-[30rem] object-cover rounded-lg"
+                        className="w-full h-[30rem] object-cover rounded-lg cursor-pointer"
                       />
 
                       <div className="flex justify-between items-center w-full mt-1">
@@ -503,12 +516,16 @@ function App() {
                                 onClick={() =>
                                   handleShowMessage(parseInt(post.user_id))
                                 }
-                                className="z-[-100]"
-                                disabled={
+                                className={`z-[-100] ${
                                   parseInt(user_id) === parseInt(post.user_id)
-                                    ? true
-                                    : false
-                                }
+                                    ? 'cursor-not-allowed'
+                                    : 'cursor-pointer'
+                                } `}
+                                // disabled={
+                                //   parseInt(user_id) === parseInt(post.user_id)
+                                //     ? true
+                                //     : false
+                                // }
                               >
                                 Send Message
                               </Button>
@@ -584,7 +601,7 @@ function App() {
                                     parseInt(comment.post_id) ===
                                     parseInt(post.post_id),
                                 ).length
-                              } Show Comments`}
+                              } Comments`}
                         </Button>
                       </div>
 
@@ -603,22 +620,33 @@ function App() {
                                       key={index}
                                       className="flex gap-2 text-2xl w-full p-2 rounded-md"
                                     >
-                                      <Link to={`/profile/${comment.user_id}`}>
-                                        <img
-                                          src={
-                                            comment.profile_picture.length > 0
-                                              ? comment.profile_picture
-                                              : Default
-                                          }
-                                          alt="profile"
-                                          className="w-[2rem] h-[2rem] rounded-full object-cover"
-                                        />
-                                      </Link>
+                                      <img
+                                        src={
+                                          comment.profile_picture.length > 0
+                                            ? comment.profile_picture
+                                            : Default
+                                        }
+                                        alt="profile"
+                                        className="w-[2rem] h-[2rem] rounded-full object-cover"
+                                      />
                                       <div className="flex gap-2 text-sm items-center">
                                         <h1 className="font-bold">
                                           {comment.name}
                                         </h1>
                                         <p>{comment.comment_content}</p>
+
+                                        {parseInt(comment.user_id) ===
+                                          parseInt(user_id) && (
+                                          <Button
+                                            onClick={() =>
+                                              handleDeleteComment(
+                                                comment.comment_id,
+                                              )
+                                            }
+                                          >
+                                            Delete
+                                          </Button>
+                                        )}
                                       </div>
                                     </div>
                                   );
