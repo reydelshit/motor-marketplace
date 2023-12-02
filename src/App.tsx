@@ -621,6 +621,7 @@ function App() {
                                 //     : false
                                 // }
                               >
+                                <LuMessagesSquare className="w-[1.5rem] h-[1.5rem] mr-2" />
                                 Send Message
                               </Button>
                             </div>
